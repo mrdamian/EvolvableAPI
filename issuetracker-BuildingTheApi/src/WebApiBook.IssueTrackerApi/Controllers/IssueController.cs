@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
@@ -29,8 +29,12 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             var issues = await _store.FindAsync();
             var issuesState = new IssuesState();
             issuesState.Issues = issues.Select(i => _stateFactory.Create(i));
-            issuesState.Links.Add(new Link{Href=Request.RequestUri, Rel = LinkFactory.Rels.Self});
-            return Request.CreateResponse(HttpStatusCode.OK, issuesState);
+            issuesState.Links.Add(new Link { Href = Request.RequestUri, Rel = LinkFactory.Rels.Self });
+            var response = Request.CreateResponse(HttpStatusCode.OK, issuesState);
+            response.Headers.CacheControl = new CacheControlHeaderValue();
+            response.Headers.CacheControl.Public = true; // <1>
+            response.Headers.CacheControl.MaxAge = TimeSpan.FromMinutes(5); // <2>
+            return response;
         } 
 
         public async Task<HttpResponseMessage> Get(string id)
