@@ -42,7 +42,12 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             var issue = await _store.FindAsync(id);
             if (issue == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            return Request.CreateResponse(HttpStatusCode.OK, _stateFactory.Create(issue));
+            var response = Request.CreateResponse(HttpStatusCode.OK, _stateFactory.Create(issue));
+            response.Headers.CacheControl = new CacheControlHeaderValue();
+            response.Headers.CacheControl.Public = true; // <1>
+            response.Headers.CacheControl.MaxAge = TimeSpan.FromMinutes(5); // <2>
+            response.Content.Headers.LastModified = new DateTimeOffset(new DateTime(2013, 9, 4));
+            return response;
         }
 
         public async Task<HttpResponseMessage> GetSearch(string searchText)
