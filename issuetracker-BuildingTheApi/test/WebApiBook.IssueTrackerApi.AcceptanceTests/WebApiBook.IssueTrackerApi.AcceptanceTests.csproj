@@ -99,6 +99,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Features\CacheValidation.cs" />
     <Compile Include="Features\OutputCaching.cs" />
     <Compile Include="Features\RetreivingHome.cs" />
     <Compile Include="HomeFeature.cs" />

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
@@ -42,6 +43,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
                     Title = "An issue",
                     Description = "This is an issue", 
                     Status = IssueStatus.Open,
+                    LastModified = new DateTimeOffset(new DateTime(2013, 9, 4))
                 },
                 new Issue
                 {
@@ -49,6 +51,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
                     Title = "Another issue",
                     Description = "This is another issue",
                     Status = IssueStatus.Closed,
+                    LastModified = new DateTimeOffset(new DateTime(2013, 9, 4))
                 },
             };
         }

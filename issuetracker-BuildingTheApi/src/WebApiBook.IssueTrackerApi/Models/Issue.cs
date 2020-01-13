@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace WebApiBook.IssueTrackerApi.Models
 {
@@ -11,5 +8,6 @@ namespace WebApiBook.IssueTrackerApi.Models
         public string Title { get; set; }
         public string Description { get; set; }
         public IssueStatus Status { get; set; }
+        public DateTimeOffset? LastModified { get; set; }
     }
 }

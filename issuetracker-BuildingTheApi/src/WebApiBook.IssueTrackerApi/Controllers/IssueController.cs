@@ -42,11 +42,23 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             var issue = await _store.FindAsync(id);
             if (issue == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            var response = Request.CreateResponse(HttpStatusCode.OK, _stateFactory.Create(issue));
-            response.Headers.CacheControl = new CacheControlHeaderValue();
-            response.Headers.CacheControl.Public = true; // <1>
-            response.Headers.CacheControl.MaxAge = TimeSpan.FromMinutes(5); // <2>
-            response.Content.Headers.LastModified = new DateTimeOffset(new DateTime(2013, 9, 4));
+
+            HttpResponseMessage response;
+
+            if (Request.Headers.IfModifiedSince.HasValue && Request.Headers.IfModifiedSince == issue.LastModified) // <1>
+            {
+                response = Request
+                .CreateResponse(HttpStatusCode.NotModified); // <2>
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, _stateFactory.Create(issue));
+                response.Content.Headers.LastModified = issue.LastModified;
+            }
+
+            response.Headers.CacheControl = new CacheControlHeaderValue(); // <3>
+            response.Headers.CacheControl.Public = true;
+            response.Headers.CacheControl.MaxAge = TimeSpan.FromMinutes(5);
             return response;
         }
 
