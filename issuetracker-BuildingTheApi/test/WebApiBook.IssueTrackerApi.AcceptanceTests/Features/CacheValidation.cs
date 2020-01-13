@@ -44,5 +44,38 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests.Features
             "Then it is not returned".
              f(() => Assert.Null(issue));
         }
+
+        [Scenario]
+        public void RetrievingModifiedIssue()
+        {
+            IssueState issue = null;
+            var fakeIssue = FakeIssues.FirstOrDefault();
+            "Given an existing issue".
+            f(() => MockIssueStore.Setup(i => i.FindAsync("1"))
+            .Returns(Task.FromResult(fakeIssue)));
+            "When it is retrieved with an IfModifiedSince header".
+            f(() =>
+            {
+                Request.RequestUri = _uriIssue1;
+                Request.Headers.IfModifiedSince = fakeIssue.LastModified.Subtract(TimeSpan.FromDays(1)); // <1>
+                Response = Client.SendAsync(Request).Result;
+                issue = Response.Content.ReadAsAsync<IssueState>().Result;
+            });
+            "Then a LastModified header is returned".
+            f(() =>
+            {
+                Response.Content.Headers.LastModified.ShouldEqual(fakeIssue.LastModified);
+            });
+            "Then a CacheControl header is returned".
+            f(() =>
+            {
+                Response.Headers.CacheControl.Public.ShouldBeTrue();
+                Response.Headers.CacheControl.MaxAge.ShouldEqual(TimeSpan.FromMinutes(5));
+            });
+            "Then a '200 OK' status is returned".
+            f(() => Response.StatusCode.ShouldEqual(HttpStatusCode.OK)); // <2>
+            "Then it is returned".
+            f(() => issue.ShouldNotBeNull()); // <3>
+        }
     }
 }
