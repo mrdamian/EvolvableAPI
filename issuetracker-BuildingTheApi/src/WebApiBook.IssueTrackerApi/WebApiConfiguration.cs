@@ -6,8 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using System.Web.Http.Dispatcher;
 using Autofac;
 using Autofac.Integration.WebApi;
+using HawkNet;
+using HawkNet.WebApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using WebApiBook.IssueTrackerApi.Controllers;
@@ -23,6 +26,7 @@ namespace WebApiBook.IssueTrackerApi
         {
             config.Routes.MapHttpRoute("Root", "", new { controller = "Home"});
             config.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
+
             ConfigureFormatters(config);
             ConfigureAutofac(config, issueStore);
             EnableCors(config);

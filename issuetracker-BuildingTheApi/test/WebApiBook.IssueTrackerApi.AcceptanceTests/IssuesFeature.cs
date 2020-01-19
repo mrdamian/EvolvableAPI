@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
+using HawkNet;
+using HawkNet.WebApi;
 using Moq;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
@@ -21,6 +23,14 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
 
         protected IssuesFeature()
         {
+            var credentials = new HawkCredential
+            {
+                Id = "dh37fgj492je",
+                Key = "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn",
+                Algorithm = "sha256",
+                User = "steve"
+            };
+            
             MockIssueStore = new Mock<IIssueStore>();
             Request = new HttpRequestMessage();
             Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.issue+json"));
@@ -28,9 +38,12 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
             StateFactory = new IssueStateFactory(IssueLinks);
             FakeIssues = GetFakeIssues();
             var config = new HttpConfiguration();
-            WebApiBook.IssueTrackerApi.WebApiConfiguration.Configure(config, MockIssueStore.Object);
+            IssueTrackerApi.WebApiConfiguration.Configure(config, MockIssueStore.Object);
             var server = new HttpServer(config);
-            Client = new HttpClient(server);
+            
+            //var clientHandler = new HawkClientMessageHandler(new HttpClientHandler(), credentials, "some-app-data");
+            //Client = new HttpClient(clientHandler);
+            Client = new HttpClient(new HawkClientMessageHandler(server, credentials)); // <2>
         }
 
         private IEnumerable<Issue> GetFakeIssues()

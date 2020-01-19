@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
+using HawkNet.WebApi;
 using Newtonsoft.Json.Linq;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
@@ -24,6 +25,8 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             _linkFactory = linkFactory;
         }
 
+        [HawkAuthentication(typeof(HawkCredentialRepository), 60, true)]
+        [Authorize]
         public async Task<HttpResponseMessage> Get()
         {
             var issues = await _store.FindAsync();
@@ -35,7 +38,7 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             response.Headers.CacheControl.Public = true; // <1>
             response.Headers.CacheControl.MaxAge = TimeSpan.FromMinutes(5); // <2>
             return response;
-        } 
+        }
 
         public async Task<HttpResponseMessage> Get(string id)
         {
@@ -71,11 +74,13 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, issuesState);
         }
 
+        [HawkAuthentication(typeof(HawkCredentialRepository), 60, true)]
+        [Authorize]
         public async Task<HttpResponseMessage> Post(dynamic newIssue)
         {
-            var issue = new Issue {Title = newIssue.title, Description = newIssue.description};
+            var issue = new Issue { Title = newIssue.title, Description = newIssue.description };
             await _store.CreateAsync(issue);
-            var response = Request.CreateResponse(HttpStatusCode.Created);
+            var response = Request.CreateResponse(HttpStatusCode.Created, "ok");
             response.Headers.Location = _linkFactory.Self(issue.Id).Href;
             return response;
         }
