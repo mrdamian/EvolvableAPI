@@ -25,7 +25,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests.Features
                     fakeIssue = FakeIssues.FirstOrDefault();
                     title = fakeIssue.Title;
                     MockIssueStore.Setup(i => i.FindAsync("1")).Returns(Task.FromResult(fakeIssue));
-                    MockIssueStore.Setup(i => i.UpdateAsync(It.IsAny<Issue>())).Returns(Task.FromResult(""));
+                    MockIssueStore.Setup(i => i.UpdateAsync("1", It.IsAny<Issue>())).Returns(Task.FromResult(""));
                 });
             "When a PATCH request is made".
                 f(() =>
@@ -34,13 +34,14 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests.Features
                     issue.description = "Updated description";
                     Request.Method = new HttpMethod("PATCH");
                     Request.RequestUri = _uriIssue1;
+                    Request.Headers.IfModifiedSince = fakeIssue.LastModified;
                     Request.Content = new ObjectContent<dynamic>(issue, new JsonMediaTypeFormatter());
                     Response = Client.SendAsync(Request).Result;
                 });
             "Then a '200 OK' status is returned".
                 f(() => Response.StatusCode.ShouldEqual(HttpStatusCode.OK));
             "And the issue should be updated".
-                f(() => MockIssueStore.Verify(i => i.UpdateAsync(It.IsAny<Issue>())));
+                f(() => MockIssueStore.Verify(i => i.UpdateAsync("1", It.IsAny<Issue>())));
             "And the descripton should be updated".
                 f(() => fakeIssue.Description.ShouldEqual("Updated description"));
             "And the title should not change".

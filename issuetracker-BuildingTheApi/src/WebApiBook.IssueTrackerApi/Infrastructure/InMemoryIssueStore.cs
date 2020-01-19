@@ -40,9 +40,9 @@ namespace WebApiBook.IssueTrackerApi.Infrastructure
                 i => i.Title.Contains(searchText) || i.Description.Contains(searchText)));
         }
 
-        public Task UpdateAsync(Issue issue)
+        public Task UpdateAsync(string id, Issue issue)
         {
-            var oldIssue = FindAsync(issue.Id).Result;
+            var oldIssue = FindAsync(id).Result;
             oldIssue.Title = issue.Title;
             oldIssue.Description = issue.Description;
             oldIssue.Status = issue.Status;

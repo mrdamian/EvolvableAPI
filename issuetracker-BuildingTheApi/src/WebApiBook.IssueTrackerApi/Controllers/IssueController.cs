@@ -86,6 +86,16 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             if (issue == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
+            if (!Request.Headers.IfModifiedSince.HasValue)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Missing IfModifiedSince header");
+            }
+
+            if (Request.Headers.IfModifiedSince != issue.LastModified)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict);
+            }
+
             foreach (JProperty prop in issueUpdate)
             {
                 if (prop.Name == "title")
@@ -93,7 +103,7 @@ namespace WebApiBook.IssueTrackerApi.Controllers
                 else if (prop.Name == "description")
                     issue.Description = prop.Value.ToObject<string>();
             }
-            await _store.UpdateAsync(issue);
+            await _store.UpdateAsync(id, issue);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
       
