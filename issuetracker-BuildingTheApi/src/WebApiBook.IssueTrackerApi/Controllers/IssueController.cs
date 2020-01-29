@@ -6,7 +6,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
-using WebApiBook.IssueTrackerApi.BasicAuthentication.Filters;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
 
@@ -25,8 +24,6 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             _linkFactory = linkFactory;
         }
 
-        [HardCodedBasicAuthenticationAttribute]
-        [Authorize]
         public async Task<HttpResponseMessage> Get()
         {
             var issues = await _store.FindAsync();
@@ -40,8 +37,6 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             return response;
         }
 
-        [HardCodedBasicAuthenticationAttribute]
-        [Authorize]
         public async Task<HttpResponseMessage> Get(string id)
         {
             var issue = await _store.FindAsync(id);
@@ -76,8 +71,6 @@ namespace WebApiBook.IssueTrackerApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, issuesState);
         }
 
-        [HardCodedBasicAuthenticationAttribute]
-        [Authorize]
         public async Task<HttpResponseMessage> Post(dynamic newIssue)
         {
             var issue = new Issue { Title = newIssue.title, Description = newIssue.description };

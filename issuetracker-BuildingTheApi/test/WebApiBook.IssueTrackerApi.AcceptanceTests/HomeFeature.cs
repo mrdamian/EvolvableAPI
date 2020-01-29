@@ -14,9 +14,9 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
             Request = new HttpRequestMessage();
 
             var config = new HttpConfiguration();
-            WebApiBook.IssueTrackerApi.WebApiConfiguration.Configure(config);
+            IssueTrackerApi.WebApiConfiguration.Configure(config);
             var server = new HttpServer(config);
-            Client = new HttpClient(server);
+            Client = HttpClientFactory.Create(new BasicAuthDelegatingHandler(), server);
         }
     }
 }

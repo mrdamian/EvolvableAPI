@@ -14,22 +14,6 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
 {
     public abstract class IssuesFeature
     {
-        private class BasicInfoMessageHandler : DelegatingHandler
-        {
-            public BasicInfoMessageHandler()
-            {
-            }
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
-                string username = "Ivan";
-                string password = "Test";
-
-                string svcCredentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
-                request.Headers.Add("Authorization", "Basic " + svcCredentials);
-                return base.SendAsync(request, cancellationToken);
-            }
-        }
-
         public Mock<IIssueStore> MockIssueStore;
         public HttpResponseMessage Response;
         public IssueLinkFactory IssueLinks;
@@ -50,7 +34,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
             IssueTrackerApi.WebApiConfiguration.Configure(config, MockIssueStore.Object);
             var server = new HttpServer(config);
 
-            Client = HttpClientFactory.Create(new BasicInfoMessageHandler(), server);
+            Client = HttpClientFactory.Create(new BasicAuthDelegatingHandler(), server);
         }
 
         private IEnumerable<Issue> GetFakeIssues()

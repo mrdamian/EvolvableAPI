@@ -5,6 +5,7 @@ using Autofac;
 using Autofac.Integration.WebApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using WebApiBook.IssueTrackerApi.BasicAuthentication.Filters;
 using WebApiBook.IssueTrackerApi.Controllers;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
@@ -16,6 +17,8 @@ namespace WebApiBook.IssueTrackerApi
     {
         public static void Configure(HttpConfiguration config, IIssueStore issueStore = null)
         {
+            config.Filters.Add(new HardCodedBasicAuthenticationAttribute());
+            config.Filters.Add(new AuthorizeAttribute());
             config.Routes.MapHttpRoute("Root", "", new { controller = "Home"});
             config.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
 
