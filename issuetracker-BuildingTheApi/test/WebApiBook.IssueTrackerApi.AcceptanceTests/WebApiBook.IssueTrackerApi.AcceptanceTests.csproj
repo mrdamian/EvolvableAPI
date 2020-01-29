@@ -37,12 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HawkNet, Version=1.4.4.0, Culture=neutral, PublicKeyToken=840f8ba19d15c979, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\HawkNet.1.4.4.0\lib\net45\HawkNet.dll</HintPath>
-    </Reference>
-    <Reference Include="HawkNet.WebApi, Version=1.4.6.0, Culture=neutral, PublicKeyToken=840f8ba19d15c979, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\HawkNet.WebApi.1.4.6.0\lib\net45\HawkNet.WebApi.dll</HintPath>
-    </Reference>
     <Reference Include="Moq">
       <HintPath>..\..\src\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
     </Reference>

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http;
-using HawkNet;
-using HawkNet.WebApi;
 using Moq;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
@@ -13,6 +14,22 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
 {
     public abstract class IssuesFeature
     {
+        private class BasicInfoMessageHandler : DelegatingHandler
+        {
+            public BasicInfoMessageHandler()
+            {
+            }
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                string username = "Ivan";
+                string password = "Test";
+
+                string svcCredentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
+                request.Headers.Add("Authorization", "Basic " + svcCredentials);
+                return base.SendAsync(request, cancellationToken);
+            }
+        }
+
         public Mock<IIssueStore> MockIssueStore;
         public HttpResponseMessage Response;
         public IssueLinkFactory IssueLinks;
@@ -22,15 +39,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
         public HttpClient Client;
 
         protected IssuesFeature()
-        {
-            var credentials = new HawkCredential
-            {
-                Id = "dh37fgj492je",
-                Key = "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn",
-                Algorithm = "sha256",
-                User = "steve"
-            };
-            
+        {           
             MockIssueStore = new Mock<IIssueStore>();
             Request = new HttpRequestMessage();
             Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.issue+json"));
@@ -40,10 +49,8 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
             var config = new HttpConfiguration();
             IssueTrackerApi.WebApiConfiguration.Configure(config, MockIssueStore.Object);
             var server = new HttpServer(config);
-            
-            //var clientHandler = new HawkClientMessageHandler(new HttpClientHandler(), credentials, "some-app-data");
-            //Client = new HttpClient(clientHandler);
-            Client = new HttpClient(new HawkClientMessageHandler(server, credentials)); // <2>
+
+            Client = HttpClientFactory.Create(new BasicInfoMessageHandler(), server);
         }
 
         private IEnumerable<Issue> GetFakeIssues()
