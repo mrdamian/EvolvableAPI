@@ -102,6 +102,7 @@
     <Compile Include="Features\ConflictDetection.cs" />
     <Compile Include="Features\OutputCaching.cs" />
     <Compile Include="Features\RetreivingHome.cs" />
+    <Compile Include="Features\TracingFeature.cs" />
     <Compile Include="HomeFeature.cs" />
     <Compile Include="IssuesFeature.cs" />
     <Compile Include="Features\CreatingIssues.cs" />

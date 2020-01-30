@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Tracing;
 using Moq;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
@@ -14,6 +15,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
 {
     public abstract class IssuesFeature
     {
+        public Mock<ITraceWriter> MockTracer;
         public Mock<IIssueStore> MockIssueStore;
         public HttpResponseMessage Response;
         public IssueLinkFactory IssueLinks;
@@ -21,6 +23,7 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
         public IEnumerable<Issue> FakeIssues;
         public HttpRequestMessage Request { get; private set; }
         public HttpClient Client;
+        public HttpConfiguration Configuration;
 
         protected IssuesFeature()
         {           
@@ -30,9 +33,11 @@ namespace WebApiBook.IssueTrackerApp.AcceptanceTests
             IssueLinks = new IssueLinkFactory(Request);
             StateFactory = new IssueStateFactory(IssueLinks);
             FakeIssues = GetFakeIssues();
-            var config = new HttpConfiguration();
-            IssueTrackerApi.WebApiConfiguration.Configure(config, MockIssueStore.Object);
-            var server = new HttpServer(config);
+            Configuration = new HttpConfiguration();
+            MockTracer = new Mock<ITraceWriter>(MockBehavior.Loose);
+            IssueTrackerApi.WebApiConfiguration.Configure(Configuration, MockIssueStore.Object);
+            Configuration.Services.Replace(typeof(ITraceWriter), MockTracer.Object);
+            var server = new HttpServer(Configuration);
 
             Client = HttpClientFactory.Create(new BasicAuthDelegatingHandler(), server);
         }

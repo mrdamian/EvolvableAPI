@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using System.Web.Http.Tracing;
 using Autofac;
 using Autofac.Integration.WebApi;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using WebApiBook.IssueTrackerApi.Controllers;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
 using WebApiContrib.Formatting.CollectionJson.Client;
+using ITraceWriter = System.Web.Http.Tracing.ITraceWriter;
 
 namespace WebApiBook.IssueTrackerApi
 {
@@ -17,6 +19,7 @@ namespace WebApiBook.IssueTrackerApi
     {
         public static void Configure(HttpConfiguration config, IIssueStore issueStore = null)
         {
+            config.EnableSystemDiagnosticsTracing();
             config.Filters.Add(new HardCodedBasicAuthenticationAttribute());
             config.Filters.Add(new AuthorizeAttribute());
             config.Routes.MapHttpRoute("Root", "", new { controller = "Home"});

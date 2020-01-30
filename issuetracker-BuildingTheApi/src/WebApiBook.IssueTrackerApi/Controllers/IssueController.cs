@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Tracing;
 using Newtonsoft.Json.Linq;
 using WebApiBook.IssueTrackerApi.Infrastructure;
 using WebApiBook.IssueTrackerApi.Models;
@@ -40,8 +41,19 @@ namespace WebApiBook.IssueTrackerApi.Controllers
         public async Task<HttpResponseMessage> Get(string id)
         {
             var issue = await _store.FindAsync(id);
+
+            var tracer = this.Configuration.Services.GetTraceWriter(); // <1>
+            tracer.Trace(Request, typeof(IssueController).FullName, TraceLevel.Info,
+                (traceRecord) =>
+                {
+                    traceRecord.Message = string.Format("Fetching issue with id {0}", id);
+                });
+            
+
             if (issue == null)
+            {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
 
             HttpResponseMessage response;
 
